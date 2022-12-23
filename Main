@@ -1,0 +1,69 @@
+#include <env/env.h>
+
+#include <stdlib.h>
+
+ 
+
+int main(int argc, char** argv)
+
+{
+
+    const char* Vfs1Args[] = {
+
+        "-l", "devfs /dev devfs 0",
+
+        "-l", "romfs /etc romfs 0"
+
+    };
+
+ 
+
+    ENV_REGISTER_ARGS("Vfs1", Vfs1Args);
+
+ 
+
+    envServerRun();
+
+ 
+
+    return EXIT_SUCCESS;
+
+}
+
+include (platform/nk)
+
+ 
+
+# Установка флагов компиляции
+
+project_header_default ("STANDARD_GNU_11:YES" "STRICT_WARNINGS:NO")
+
+ 
+
+# Генерация файла Client.edl.h
+
+nk_build_edl_files (client_edl_files NK_MODULE "client" EDL "${CMAKE_SOURCE_DIR}/resources/edl/Client.edl")
+
+ 
+
+add_executable (Client "src/client.c")
+
+add_dependencies (Client client_edl_files)
+
+ 
+
+# Компоновка с библиотеками VFS
+
+target_link_libraries (Client ${vfs_LOCAL_LIB} ${vfs_IMPLEMENTATION_LIB} ${dnet_IMPLEMENTATION_LIB}
+
+/* Ядру KasperskyOS и любому процессу
+
+ * в решении разрешено запускать любой
+
+ * процесс. */
+
+execute { grant () }
+
+
+execute src=kl.core.Core, dst=kl.core.Core { grant () }
+
